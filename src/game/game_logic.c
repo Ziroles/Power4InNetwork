@@ -4,7 +4,8 @@
 #include <stdbool.h>
 void initColumn(Column *column)
 {
-    for (int i = 0; i < COLONNE_SIZE; i++){
+    for (int i = 0; i < COLONNE_SIZE; i++)
+    {
         column->pawn[i].color = VOID;
     }
     column->nbPawns = 0;
@@ -27,7 +28,7 @@ void initPlayer(Player *player, const char *name, Color color)
 Game initGame(char *names[2])
 {
     Game game;
-    initBoard(&(game.board)); // Utiliser & pour passer un pointeur si nécessaire
+    initBoard(&(game.board));
     game.currentPlayer = 1;
     game.winner = -1;
     for (int i = 0; i < 2; i++)
@@ -42,11 +43,11 @@ void addPawnToColumn(Column *column, int player)
     switch (player)
     {
     case 1:
-        column->pawn[column->nbPawns].color = YELLOW;
+        column->pawn[5 - column->nbPawns].color = YELLOW;
         break;
 
     default:
-        column->pawn[column->nbPawns].color = RED;
+        column->pawn[5 - column->nbPawns].color = RED;
         break;
     }
 }
@@ -93,12 +94,6 @@ bool winnableOnCol(Column *column)
     return false;
 }
 
-/**
- * Checks if there is a winning combination of pawns on any line of the board.
- *
- * @param board The game board.
- * @return true if there is a winning combination, false otherwise.
- */
 bool winnableOnLine(Board *board)
 {
     for (int i = 0; i < BOARD_SIZE; i++)
@@ -110,15 +105,14 @@ bool winnableOnLine(Board *board)
             if (board->columns[j].pawn[i].color == precedent && precedent != VOID)
             {
                 count++;
-                if (count == 3) // Si on a compté 4 pions consécutifs, count sera à 3.
+                if (count == 4)
                 {
                     return true;
                 }
             }
             else
             {
-                // Réinitialisation de count à 1 si la couleur actuelle n'est pas VOID,
-                // sinon à 0 si la couleur est VOID.
+
                 count = (board->columns[j].pawn[i].color != VOID) ? 1 : 0;
             }
             precedent = board->columns[j].pawn[i].color;
@@ -213,7 +207,7 @@ void printBoard(Board *board)
 void playTurn(Game *game)
 {
     int col;
-    printf("Joueur %d, entrez le numéro de la colonne où vous voulez jouer : ", game->currentPlayer);
+    printf("%s, entrez le numéro de la colonne où vous voulez jouer : ", game->players[game->currentPlayer].name);
     scanf("%d", &col);
 
     if (col < 1 || col > BOARD_SIZE)
