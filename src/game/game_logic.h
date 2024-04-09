@@ -45,7 +45,7 @@ typedef struct
     int winner;
 } Game;
 
-void printBoard(const Board *board);
+void printBoard(Board *board);
 void initBoard(Board *board);
 void initPlayer(Player *player, const char *name, Color color);
 bool winnableOnCol(Column *column);
@@ -57,8 +57,9 @@ bool isWinningMove(Game *game);
 
 bool isColumnFull(const Column *column);
 void initColumn(Column *column);
-int addPawnToColumn(Column *column, int player);
+void addPawnToColumn(Column *column, int player);
 bool isWinningMove(Game *game);
 Game initGame(char *names[2]);
 void printBoard(Board *board);
+void playTurn(Game *game);
 #endif

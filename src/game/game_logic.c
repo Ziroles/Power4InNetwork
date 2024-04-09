@@ -4,8 +4,7 @@
 #include <stdbool.h>
 void initColumn(Column *column)
 {
-    for (int i = 0; i < COLONNE_SIZE; i++)
-    {
+    for (int i = 0; i < COLONNE_SIZE; i++){
         column->pawn[i].color = VOID;
     }
     column->nbPawns = 0;
@@ -19,7 +18,7 @@ void initBoard(Board *board)
     };
     board->nbPlaySinceStart = 0;
 }
-void initPlayer(Player *player, char *name, Color color)
+void initPlayer(Player *player, const char *name, Color color)
 {
     strcpy(player->name, name);
     player->color = color;
@@ -167,18 +166,24 @@ bool winnableOnDiagDown(Board *board)
 
 bool isWinningMove(Game *game)
 {
-    return winnableOnCol(&game->board.columns[game->board.columns[0].nbPawns - 1]) ||
-           winnableOnLine(&game->board) ||
-           winnableOnDiagonalUp(&game->board) ||
-           winnableOnDiagonalDown(&game->board);
+    for (int i = 0; i < BOARD_SIZE; i++)
+    {
+        if (winnableOnCol(&game->board.columns[i]))
+        {
+            return true;
+        }
+    }
+    return winnableOnLine(&game->board) ||
+           winnableOnDiagUp(&game->board) ||
+           winnableOnDiagDown(&game->board);
 }
 
-bool isColumnFull(Column *column)
+bool isColumnFull(const Column *column)
 {
     return column->nbPawns == COLONNE_SIZE;
 }
 
-bool isBoardFull(Board *board)
+bool isBoardFull(const Board *board)
 {
     return board->nbPlaySinceStart == BOARD_SIZE * COLONNE_SIZE;
 }
