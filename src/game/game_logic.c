@@ -1,4 +1,5 @@
 #include "game_logic.h"
+#include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 void initColumn(Column *column)
@@ -18,11 +19,23 @@ void initBoard(Board *board)
     };
     board->nbPlaySinceStart = 0;
 }
-void initGame(Game *game)
+void initPlayer(Player *player, char *name, Color color)
 {
-    initBoard(&game->board);
-    game->currentPlayer = 1;
-    game->winner = -1;
+    strcpy(player->name, name);
+    player->color = color;
+}
+
+Game initGame(char *names[2])
+{
+    Game game;
+    initBoard(&(game.board)); // Utiliser & pour passer un pointeur si nécessaire
+    game.currentPlayer = 1;
+    game.winner = -1;
+    for (int i = 0; i < 2; i++)
+    {
+        initPlayer(&(game.players[i]), names[i], i + 1);
+    }
+    return game;
 }
 
 void addPawnToColumn(Column *column, int player)
@@ -115,7 +128,7 @@ bool winnableOnLine(Board *board)
     return false;
 }
 
-bool winnableOnDiagonalUp(Board *board)
+bool winnableOnDiagUp(Board *board)
 {
     for (int row = 0; row <= BOARD_SIZE - 4; row++)
     {
@@ -133,7 +146,7 @@ bool winnableOnDiagonalUp(Board *board)
     }
     return false;
 }
-bool winnableOnDiagonalDown(Board *board)
+bool winnableOnDiagDown(Board *board)
 {
     for (int row = 3; row < BOARD_SIZE; row++)
     {
@@ -160,7 +173,65 @@ bool isWinningMove(Game *game)
            winnableOnDiagonalDown(&game->board);
 }
 
+bool isColumnFull(Column *column)
+{
+    return column->nbPawns == COLONNE_SIZE;
+}
+
 bool isBoardFull(Board *board)
 {
     return board->nbPlaySinceStart == BOARD_SIZE * COLONNE_SIZE;
+}
+
+void printBoard(Board *board)
+{
+    for (int i = 0; i < COLONNE_SIZE; i++)
+    {
+        for (int j = 0; j < BOARD_SIZE; j++)
+        {
+            switch (board->columns[j].pawn[i].color)
+            {
+            case YELLOW:
+                printf("Y ");
+                break;
+            case RED:
+                printf("R ");
+                break;
+            default:
+                printf(". ");
+                break;
+            }
+        }
+        printf("\n");
+    }
+}
+void playTurn(Game *game)
+{
+    int col;
+    printf("Joueur %d, entrez le numéro de la colonne où vous voulez jouer : ", game->currentPlayer);
+    scanf("%d", &col);
+
+    if (col < 1 || col > BOARD_SIZE)
+    {
+        printf("Colonne invalide. Veuillez essayer à nouveau.\n");
+        return;
+    }
+    col--;
+
+    if (isColumnFull(&game->board.columns[col]))
+    {
+        printf("Cette colonne est pleine. Veuillez essayer une autre colonne.\n");
+    }
+    else
+    {
+        checkColumn(&game->board.columns[col], game->currentPlayer);
+        game->board.nbPlaySinceStart++;
+
+        if (isWinningMove(game))
+        {
+            game->winner = game->currentPlayer;
+        }
+
+        game->currentPlayer = (game->currentPlayer == 1) ? 2 : 1;
+    }
 }
